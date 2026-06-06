@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VideoDown Online</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0f;--surface:#111118;--surface2:#18181f;--surface3:#1e1e28;
+  --border:#ffffff12;--border2:#ffffff20;
+  --text:#f0f0f8;--muted:#7878a0;--muted2:#5a5a7a;
+  --accent1:#7c3aed;--accent2:#06b6d4;--accent3:#10b981;
+  --grad:linear-gradient(135deg,#7c3aed,#06b6d4);
+  --grad2:linear-gradient(135deg,#10b981,#06b6d4);
+  --r:16px;--r2:10px;--r3:8px;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+.orb{position:fixed;border-radius:50%;pointer-events:none;filter:blur(100px);opacity:.12;z-index:0}
+.orb1{width:700px;height:700px;background:#7c3aed;top:-200px;left:-150px}
+.orb2{width:500px;height:500px;background:#06b6d4;bottom:-100px;right:-100px}
+.app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+.header{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 2.5rem;border-bottom:1px solid var(--border);background:#0a0a0fcc;backdrop-filter:blur(12px);position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-icon{width:38px;height:38px;border-radius:10px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff}
+.logo-text{font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem}
+.logo-text span{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header-right{display:flex;align-items:center;gap:12px}
+.ver-badge{font-size:11px;background:#ffffff0d;border:1px solid var(--border2);padding:5px 14px;border-radius:20px;color:var(--muted);font-family:monospace}
+.online-badge{display:flex;align-items:center;gap:6px;font-size:.78rem;color:#10b981;background:#10b98115;border:1px solid #10b98130;padding:5px 12px;border-radius:20px}
+.dot{width:7px;height:7px;border-radius:50%;background:#10b981;box-shadow:0 0 6px #10b981;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.main{flex:1;display:grid;grid-template-columns:1fr 420px;gap:0;max-width:100%}
+.left-panel{padding:2rem 2rem 2rem 2.5rem;border-right:1px solid var(--border);overflow-y:auto}
+.right-panel{padding:2rem 2.5rem 2rem 2rem;display:flex;flex-direction:column;gap:1.25rem;overflow-y:auto;background:#0d0d14}
+.sec-title{font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.12em;color:var(--muted2);text-transform:uppercase;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.url-wrap{position:relative;margin-bottom:1.5rem}
+.url-input{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r2);padding:1rem 1rem 1rem 3.2rem;font-size:1rem;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;transition:border .2s,box-shadow .2s}
+.url-input::placeholder{color:var(--muted2)}
+.url-input:focus{border-color:var(--accent1);box-shadow:0 0 0 3px #7c3aed1a}
+.url-icon{position:absolute;left:1.1rem;top:50%;transform:translateY(-50%);color:var(--muted);font-size:20px;pointer-events:none}
+.paste-btn{position:absolute;right:.7rem;top:50%;transform:translateY(-50%);background:#ffffff0d;border:1px solid var(--border2);color:var(--muted);font-size:.78rem;padding:6px 14px;border-radius:6px;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:5px}
+.paste-btn:hover{background:#ffffff18;color:var(--text)}
+.site-badge{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;padding:5px 14px;border-radius:20px;border:1px solid;font-weight:500;margin-bottom:1.5rem}
+.site-badge.yt{background:#ff000015;border-color:#ff000040;color:#ff6060}
+.site-badge.ig{background:#e040fb15;border-color:#e040fb40;color:#e07aff}
+.site-badge.tt{background:#00f2ea15;border-color:#00f2ea40;color:#00e5d4}
+.site-badge.fb{background:#1877f215;border-color:#1877f240;color:#60a0ff}
+.site-badge.ok{background:#10b98115;border-color:#10b98140;color:#10b981}
+.site-badge.hidden{display:none}
+.quality-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem;margin-bottom:1.75rem}
+.q-btn{background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r2);padding:.85rem .5rem;text-align:center;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:6px}
+.q-btn i{font-size:22px;color:var(--muted);transition:color .2s}
+.q-btn .q-name{font-size:.82rem;font-weight:600;color:var(--muted);transition:color .2s}
+.q-btn .q-sub{font-size:.7rem;color:var(--muted2)}
+.q-btn:hover{border-color:var(--border2);background:#ffffff06}
+.q-btn.active{border-color:var(--accent1);background:#7c3aed15}
+.q-btn.active i,.q-btn.active .q-name{color:var(--accent1)}
+.q-btn.active-green{border-color:var(--accent3);background:#10b98115}
+.q-btn.active-green i,.q-btn.active-green .q-name{color:var(--accent3)}
+.extras{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:2rem}
+.toggle-card{background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r2);padding:.9rem 1rem;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .2s}
+.toggle-card:hover{border-color:var(--border2)}
+.toggle-card.on{border-color:#7c3aed50;background:#7c3aed0c}
+.toggle-icon{width:34px;height:34px;border-radius:8px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--muted);flex-shrink:0;transition:all .2s}
+.toggle-card.on .toggle-icon{background:#7c3aed20;color:var(--accent1)}
+.toggle-name{font-size:.83rem;font-weight:500;color:var(--text)}
+.toggle-sub{font-size:.72rem;color:var(--muted)}
+.toggle-dot{width:8px;height:8px;border-radius:50%;background:var(--border2);margin-left:auto;flex-shrink:0;transition:background .2s}
+.toggle-card.on .toggle-dot{background:var(--accent1);box-shadow:0 0 6px var(--accent1)}
+.dl-btn{width:100%;padding:1.1rem;border-radius:var(--r2);border:none;cursor:pointer;font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:700;color:#fff;background:var(--grad);position:relative;overflow:hidden;transition:transform .15s,box-shadow .2s}
+.dl-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 30px #7c3aed40}
+.dl-btn:disabled{opacity:.45;cursor:not-allowed}
+.dl-btn .shine{position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,#ffffff20,transparent);animation:shine 2.5s infinite}
+@keyframes shine{to{left:150%}}
+.progress-wrap{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);padding:1.25rem;margin-top:1.25rem;display:none}
+.progress-wrap.show{display:block;animation:fadeup .3s ease}
+.progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem}
+.progress-label{font-size:.82rem;font-weight:500;color:var(--text)}
+.progress-pct{font-size:.82rem;font-weight:700;color:var(--accent2)}
+.progress-track{background:var(--surface);border-radius:20px;height:7px;overflow:hidden;border:1px solid var(--border)}
+.progress-bar{height:100%;border-radius:20px;background:var(--grad2);width:0%;transition:width .4s}
+.status-row{display:flex;align-items:center;gap:8px;margin-top:.75rem}
+.spin{display:inline-block;width:13px;height:13px;border:2px solid var(--border2);border-top-color:var(--accent2);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.status-txt{font-size:.78rem;color:var(--muted);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.log-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--r3);padding:.75rem 1rem;font-family:monospace;font-size:.72rem;color:var(--muted);max-height:120px;overflow-y:auto;margin-top:.75rem;word-break:break-all;line-height:1.5}
+/* Result */
+.result-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem;display:none}
+.result-card.show{display:block;animation:fadeup .4s ease}
+@keyframes fadeup{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.result-card.success{border-color:#10b98135}
+.result-card.error{border-color:#ef444435}
+.result-head{display:flex;align-items:center;gap:10px;margin-bottom:.75rem}
+.result-icon-box{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.result-card.success .result-icon-box{background:#10b98118;color:#10b981}
+.result-card.error .result-icon-box{background:#ef444418;color:#ef4444}
+.result-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700}
+.result-card.success .result-title{color:#10b981}
+.result-card.error .result-title{color:#ef4444}
+.result-body{font-size:.83rem;color:var(--muted);line-height:1.6;margin-bottom:1rem}
+
+/* DOWNLOAD BUTTON */
+.file-dl-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:1rem;border-radius:var(--r2);border:none;cursor:pointer;font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:#fff;background:var(--grad2);text-decoration:none;transition:transform .15s,box-shadow .2s;margin-top:.5rem}
+.file-dl-btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px #10b98140}
+.file-dl-btn i{font-size:20px}
+
+.warning-card{background:#f59e0b0d;border:1px solid #f59e0b30;border-radius:var(--r2);padding:1rem 1.1rem;font-size:.8rem;color:#f59e0b;line-height:1.5;display:flex;gap:10px;align-items:flex-start}
+.warning-card i{font-size:18px;flex-shrink:0;margin-top:1px}
+
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem}
+.stat-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:.9rem;text-align:center}
+.stat-num{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-lbl{font-size:.7rem;color:var(--muted);margin-top:2px}
+.feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+.feat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:.9rem 1rem;display:flex;align-items:center;gap:10px}
+.feat i{font-size:20px;flex-shrink:0}
+.feat-label{font-size:.78rem;color:var(--muted);line-height:1.35}
+.feat i.c1{color:var(--accent1)}.feat i.c2{color:var(--accent2)}.feat i.c3{color:var(--accent3)}
+.feat i.c4{color:#f59e0b}.feat i.c5{color:#ec4899}.feat i.c6{color:#8b5cf6}
+footer{text-align:center;padding:1rem;font-size:.72rem;color:var(--muted2);border-top:1px solid var(--border);grid-column:1/-1}
+@media(max-width:900px){
+  .main{grid-template-columns:1fr}
+  .right-panel{border-top:1px solid var(--border)}
+  .left-panel,.right-panel{padding:1.5rem}
+  .header{padding:1rem 1.5rem}
+}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="app">
+<header class="header">
+  <div class="logo">
+    <div class="logo-icon"><i class="ti ti-player-play"></i></div>
+    <span class="logo-text">VÍDEO<span>DOWN</span></span>
+  </div>
+  <div class="header-right">
+    <div class="online-badge"><div class="dot"></div>Online</div>
+    <span class="ver-badge" id="ytdlpVersion">Verificando...</span>
+  </div>
+</header>
+
+<div class="main">
+  <!-- LEFT -->
+  <div class="left-panel">
+    <div class="sec-title"><i class="ti ti-link"></i> URL do Vídeo ou Playlist</div>
+    <div class="url-wrap">
+      <i class="ti ti-link url-icon"></i>
+      <input type="text" class="url-input" id="urlInput" placeholder="Cole aqui: https://youtube.com/watch?v=..." autocomplete="off">
+      <button class="paste-btn" onclick="pasteURL()"><i class="ti ti-clipboard"></i> Colar</button>
+    </div>
+    <div class="site-badge hidden" id="siteBadge">
+      <i class="ti ti-circle-check"></i><span id="siteLabel"></span>
+    </div>
+
+    <div class="sec-title"><i class="ti ti-settings"></i> Qualidade / Formato</div>
+    <div class="quality-grid">
+      <div class="q-btn active" data-fmt="bestvideo+bestaudio/best" data-audio="false" onclick="selectQ(this)">
+        <i class="ti ti-sparkles"></i><span class="q-name">Melhor</span><span class="q-sub">MP4 auto</span>
+      </div>
+      <div class="q-btn" data-fmt="bestvideo[height<=1080]+bestaudio/best" data-audio="false" onclick="selectQ(this)">
+        <i class="ti ti-device-laptop"></i><span class="q-name">1080p</span><span class="q-sub">Full HD</span>
+      </div>
+      <div class="q-btn" data-fmt="bestvideo[height<=720]+bestaudio/best" data-audio="false" onclick="selectQ(this)">
+        <i class="ti ti-device-mobile"></i><span class="q-name">720p</span><span class="q-sub">HD</span>
+      </div>
+      <div class="q-btn" data-fmt="bestvideo[height<=480]+bestaudio/best" data-audio="false" onclick="selectQ(this)">
+        <i class="ti ti-wifi"></i><span class="q-name">480p</span><span class="q-sub">Economia</span>
+      </div>
+      <div class="q-btn" data-fmt="bestvideo[height<=2160]+bestaudio/best" data-audio="false" onclick="selectQ(this)">
+        <i class="ti ti-4k"></i><span class="q-name">2160p</span><span class="q-sub">4K</span>
+      </div>
+      <div class="q-btn" data-fmt="" data-audio="true" onclick="selectQ(this)">
+        <i class="ti ti-music"></i><span class="q-name">MP3</span><span class="q-sub">Só áudio</span>
+      </div>
+    </div>
+
+    <div class="sec-title"><i class="ti ti-adjustments"></i> Opções</div>
+    <div class="extras">
+      <div class="toggle-card" id="togPlaylist" onclick="toggleOpt('playlist')">
+        <div class="toggle-icon"><i class="ti ti-list"></i></div>
+        <div><div class="toggle-name">Playlist</div><div class="toggle-sub">Baixar completa</div></div>
+        <div class="toggle-dot"></div>
+      </div>
+      <div class="toggle-card" id="togSubs" onclick="toggleOpt('subs')">
+        <div class="toggle-icon"><i class="ti ti-subtask"></i></div>
+        <div><div class="toggle-name">Legendas</div><div class="toggle-sub">PT + EN</div></div>
+        <div class="toggle-dot"></div>
+      </div>
+    </div>
+
+    <button class="dl-btn" id="dlBtn" onclick="startDownload()">
+      <span class="shine"></span>
+      <i class="ti ti-download"></i>&nbsp;&nbsp;Baixar Vídeo
+    </button>
+
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-header">
+        <span class="progress-label" id="progLabel">Preparando...</span>
+        <span class="progress-pct" id="progPct">0%</span>
+      </div>
+      <div class="progress-track"><div class="progress-bar" id="progBar"></div></div>
+      <div class="status-row"><div class="spin"></div><span class="status-txt" id="statusMsg">Conectando...</span></div>
+      <div class="log-box" id="logBox"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right-panel">
+    <div class="sec-title"><i class="ti ti-activity"></i> Status do Download</div>
+
+    <div class="result-card" id="resultCard">
+      <div class="result-head">
+        <div class="result-icon-box"><i class="ti" id="resultIcon"></i></div>
+        <div class="result-title" id="resultTitle"></div>
+      </div>
+      <div class="result-body" id="resultBody"></div>
+      <a class="file-dl-btn" id="fileBtn" href="#" download style="display:none">
+        <i class="ti ti-download"></i> Clique para baixar o arquivo
+      </a>
+    </div>
+
+    <div class="warning-card">
+      <i class="ti ti-clock"></i>
+      <span>Os arquivos ficam disponíveis por <strong>30 minutos</strong> no servidor. Baixe logo após o processamento.</span>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-box"><div class="stat-num">1000+</div><div class="stat-lbl">Plataformas</div></div>
+      <div class="stat-box"><div class="stat-num">4K</div><div class="stat-lbl">Qualidade max</div></div>
+      <div class="stat-box"><div class="stat-num">MP3</div><div class="stat-lbl">Áudio direto</div></div>
+    </div>
+
+    <div class="sec-title"><i class="ti ti-apps"></i> Recursos</div>
+    <div class="feat-grid">
+      <div class="feat"><i class="ti ti-world c1"></i><div class="feat-label">YouTube, Instagram, TikTok e +</div></div>
+      <div class="feat"><i class="ti ti-bolt c2"></i><div class="feat-label">Progresso em tempo real</div></div>
+      <div class="feat"><i class="ti ti-shield c3"></i><div class="feat-label">Sem login necessário</div></div>
+      <div class="feat"><i class="ti ti-device-mobile c5"></i><div class="feat-label">Funciona no celular</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>Itamir Downloader 2025 &mdash; powered by yt-dlp &mdash; Hospedado no Render</footer>
+</div>
+
+<script>
+const opts={playlist:false,subs:false};
+let selFmt="bestvideo+bestaudio/best", selAudio=false;
+
+fetch('/api/health').then(r=>r.json()).then(d=>{
+  const el=document.getElementById('ytdlpVersion');
+  el.textContent=d.ok?'yt-dlp v'+d.ytdlp:'yt-dlp não encontrado';
+  if(!d.ok)el.style.color='#ef4444';
+}).catch(()=>{});
+
+document.getElementById('urlInput').addEventListener('input',detectSite);
+
+function detectSite(){
+  const v=document.getElementById('urlInput').value.trim();
+  const badge=document.getElementById('siteBadge'), lbl=document.getElementById('siteLabel');
+  badge.className='site-badge';
+  if(!v){badge.classList.add('hidden');return}
+  if(/youtube|youtu\.be/i.test(v)){lbl.textContent='YouTube';badge.classList.add('yt')}
+  else if(/instagram/i.test(v)){lbl.textContent='Instagram';badge.classList.add('ig')}
+  else if(/tiktok/i.test(v)){lbl.textContent='TikTok';badge.classList.add('tt')}
+  else if(/facebook|fb\.watch/i.test(v)){lbl.textContent='Facebook';badge.classList.add('fb')}
+  else if(/http/i.test(v)){lbl.textContent='Site detectado';badge.classList.add('ok')}
+  else badge.classList.add('hidden');
+}
+
+async function pasteURL(){
+  try{const t=await navigator.clipboard.readText();document.getElementById('urlInput').value=t;detectSite();}
+  catch(e){document.getElementById('urlInput').focus();}
+}
+
+function selectQ(el){
+  document.querySelectorAll('.q-btn').forEach(b=>b.classList.remove('active','active-green'));
+  selFmt=el.dataset.fmt; selAudio=el.dataset.audio==='true';
+  el.classList.add(selAudio?'active-green':'active');
+}
+
+function toggleOpt(key){
+  opts[key]=!opts[key];
+  const el=document.getElementById('tog'+key.charAt(0).toUpperCase()+key.slice(1));
+  opts[key]?el.classList.add('on'):el.classList.remove('on');
+}
+
+function startDownload(){
+  const url=document.getElementById('urlInput').value.trim();
+  document.getElementById('resultCard').className='result-card';
+  document.getElementById('fileBtn').style.display='none';
+  if(!url){showError('URL vazia','Cole um link válido.');return}
+  if(!/^https?:\/\//i.test(url)){showError('URL inválida','Deve começar com https://');return}
+
+  document.getElementById('dlBtn').disabled=true;
+  document.getElementById('progressWrap').classList.add('show');
+  document.getElementById('progBar').style.width='0%';
+  document.getElementById('progPct').textContent='0%';
+  document.getElementById('logBox').innerHTML='';
+  document.getElementById('statusMsg').textContent='Conectando ao servidor...';
+
+  fetchSSE('/api/download',{url,fmt:selFmt,audioOnly:selAudio,playlist:opts.playlist,subs:opts.subs});
+}
+
+function fetchSSE(endpoint,body){
+  fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
+  .then(res=>{
+    const reader=res.body.getReader(), decoder=new TextDecoder();
+    let buf='';
+    function read(){
+      reader.read().then(({done,value})=>{
+        if(done){resetBtn();return}
+        buf+=decoder.decode(value,{stream:true});
+        const lines=buf.split('\n'); buf=lines.pop();
+        lines.forEach(line=>{
+          if(line.startsWith('data: ')){try{handleEvent(JSON.parse(line.slice(6)));}catch(e){}}
+        });
+        read();
+      }).catch(()=>{showError('Erro de conexão','Tente novamente.');resetBtn();});
+    }
+    read();
+  })
+  .catch(()=>{showError('Erro','Servidor indisponível. Tente novamente em instantes.');resetBtn();});
+}
+
+function handleEvent(e){
+  if(e.type==='progress'){
+    const pct=Math.min(Math.round(e.pct),100);
+    document.getElementById('progBar').style.width=pct+'%';
+    document.getElementById('progPct').textContent=pct+'%';
+    document.getElementById('progLabel').textContent='Baixando no servidor...';
+    document.getElementById('statusMsg').textContent=e.msg||'';
+    addLog(e.msg);
+  } else if(e.type==='log'){
+    addLog(e.msg);
+    if(e.msg)document.getElementById('statusMsg').textContent=e.msg;
+  } else if(e.type==='done'){
+    document.getElementById('progBar').style.width='100%';
+    document.getElementById('progPct').textContent='100%';
+    showSuccess(e.download_url, e.file);
+  } else if(e.type==='error'){
+    showError('Erro no download',e.msg);
+  }
+}
+
+function addLog(msg){
+  if(!msg)return;
+  const lb=document.getElementById('logBox');
+  lb.innerHTML+=msg+'<br>'; lb.scrollTop=lb.scrollHeight;
+}
+
+function showSuccess(dlUrl, filename){
+  resetBtn();
+  document.getElementById('progressWrap').classList.remove('show');
+  const rc=document.getElementById('resultCard');
+  rc.className='result-card success show';
+  document.getElementById('resultIcon').className='ti ti-circle-check';
+  document.getElementById('resultTitle').textContent='Pronto para baixar!';
+  document.getElementById('resultBody').textContent='O vídeo foi processado. Clique no botão abaixo para salvar no seu dispositivo.';
+  const btn=document.getElementById('fileBtn');
+  btn.href=dlUrl;
+  btn.download=filename||'video';
+  btn.style.display='flex';
+}
+
+function showError(title,body){
+  resetBtn();
+  document.getElementById('progressWrap').classList.remove('show');
+  const rc=document.getElementById('resultCard');
+  rc.className='result-card error show';
+  document.getElementById('resultIcon').className='ti ti-alert-circle';
+  document.getElementById('resultTitle').textContent=title;
+  document.getElementById('resultBody').textContent=body;
+  document.getElementById('fileBtn').style.display='none';
+}
+
+function resetBtn(){document.getElementById('dlBtn').disabled=false;}
+</script>
+</body>
+</html>
